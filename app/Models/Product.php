@@ -11,7 +11,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $filliable = [
+    protected $fillable = [
         'brand_id',
         'category_id',
         'name',

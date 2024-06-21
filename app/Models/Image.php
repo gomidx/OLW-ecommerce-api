@@ -10,7 +10,7 @@ class Image extends Model
 {
     use HasFactory;
 
-    protected $filliable = [
+    protected $fillable = [
         'sku_id',
         'url',
         'cover'
