@@ -10,7 +10,7 @@ class Brand extends Model
 {
     use HasFactory;
 
-    protected $filliable = [
+    protected $fillable = [
         'name',
         'is_featured'
     ];

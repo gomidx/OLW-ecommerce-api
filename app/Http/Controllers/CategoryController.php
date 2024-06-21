@@ -2,48 +2,118 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Services\CategoryService;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(
+        protected CategoryService $service
+    ) {}
+
     public function index()
     {
-        //
+        Gate::authorize('viewAny', Category::class);
+
+        try {
+            $categories = $this->service->list();
+
+            return response()->json($categories, Response::HTTP_OK);
+        } catch (Exception $e) {
+            Log::error('CategoryController - index', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'An error occurred when listing the categories.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
-        //
+        Gate::authorize('create', Category::class);
+
+        try {
+            $category = $this->service->create($request->validated());
+
+            return response()->json($category, Response::HTTP_CREATED);
+        } catch (Exception $e) {
+            Log::error('CategoryController - store', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'An error occurred when creating the category.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
+    public function show(int $id)
     {
-        //
+        Gate::authorize('view', Category::class);
+
+        try {
+            $category = $this->service->get($id);
+
+            return response()->json($category, Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Category not found.'
+            ], Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            Log::error('CategoryController - show', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'An error occurred when getting the category.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, int $id)
     {
-        //
+        Gate::authorize('update', Category::class);
+
+        try {
+            $category = $this->service->update($request->validated(), $id);
+
+            return response()->json($category, Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Category not found.'
+            ], Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            Log::error('CategoryController - update', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'An error occurred when updating the category.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
+    public function destroy(int $id)
     {
-        //
+        Gate::authorize('delete', Category::class);
+
+        try {
+            $this->service->delete($id);
+
+            return response()->json([
+                'message' => 'Category successfully deleted!'
+            ], Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Category not found.'
+            ], Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            Log::error('CategoryController - update', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'message' => 'An error occurred when updating the category.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
