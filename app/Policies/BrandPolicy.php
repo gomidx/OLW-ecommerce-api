@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Enums\RoleEnum;
-use App\Models\Brand;
 use App\Models\User;
 
 class BrandPolicy

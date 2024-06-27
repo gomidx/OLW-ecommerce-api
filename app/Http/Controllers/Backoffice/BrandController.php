@@ -6,9 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Brand\StoreBrandRequest;
 use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Models\Brand;
-use App\Services\BrandService;
+use App\Services\Backoffice\BrandService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +20,7 @@ class BrandController extends Controller
         protected BrandService $service
     ) {}
 
-    public function index()
+    public function index(): JsonResponse
     {
         Gate::authorize('viewAny', Brand::class);
 
@@ -36,7 +37,7 @@ class BrandController extends Controller
         }
     }
 
-    public function store(StoreBrandRequest $request)
+    public function store(StoreBrandRequest $request): JsonResponse
     {
         Gate::authorize('create', Brand::class);
 
@@ -53,7 +54,7 @@ class BrandController extends Controller
         }
     }
 
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
         Gate::authorize('view', Brand::class);
 
@@ -74,7 +75,7 @@ class BrandController extends Controller
         }
     }
 
-    public function update(UpdateBrandRequest $request, int $id)
+    public function update(UpdateBrandRequest $request, int $id): JsonResponse
     {
         Gate::authorize('update', Brand::class);
 
@@ -95,7 +96,7 @@ class BrandController extends Controller
         }
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
         Gate::authorize('delete', Brand::class);
 
